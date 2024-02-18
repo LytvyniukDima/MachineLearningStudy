@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+import matplotlib.pyplot as plt
 
 # Import data
 mnist = input_data.read_data_sets("datasets/MNIST_data/", one_hot=True)
@@ -35,6 +36,9 @@ batch_size = 100
 total_epochs = 10
 learning_rate = 0.001
 
+# Initialize lists to store loss values
+loss_history = []
+
 # Train the model
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
@@ -48,6 +52,7 @@ with tf.Session() as sess:
             batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             _, c = sess.run([train_step, loss], feed_dict={x: batch_xs, y_: batch_ys})
             epoch_loss += c
+            loss_history.append(c)
 
         print('Epoch', epoch, 'completed out of', total_epochs, 'loss:', epoch_loss)
 
@@ -55,3 +60,10 @@ with tf.Session() as sess:
     correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     print('Test accuracy: {}'.format(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})))
+
+
+plt.plot(loss_history)
+plt.title('Cross-Entropy Loss Over Training')
+plt.xlabel('Training Steps')
+plt.ylabel('Cross-Entropy Loss')
+plt.show()
