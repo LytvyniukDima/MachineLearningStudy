@@ -75,11 +75,12 @@ model = keras.Sequential([
 
 model.compile(
     optimizer='adam',
-    loss='mae',
+    loss='binary_crossentropy',
+    metrics=['binary_accuracy'],
 )
 
 early_stopping = keras.callbacks.EarlyStopping(
-    patience=5,
+    patience=10,
     min_delta=0.001,
     restore_best_weights=True,
 )
@@ -91,8 +92,12 @@ history = model.fit(
 )
 
 history_df = pd.DataFrame(history.history)
-history_plot = history_df.loc[:, ['loss', 'val_loss']].plot()
-print("Minimum Validation Loss: {:0.4f}".format(history_df['val_loss'].min()));
+history_df.loc[:, ['loss', 'val_loss']].plot()
+history_df.loc[5:, ['binary_accuracy', 'val_binary_accuracy']].plot()
+print(("Best Validation Loss: {:0.4f}" +\
+      "\nBest Validation Accuracy: {:0.4f}")\
+      .format(history_df['val_loss'].min(), 
+              history_df['val_binary_accuracy'].max()))
 
 plt.show()
 
@@ -101,4 +106,4 @@ integer_predictions = np.round(predictions)
 
 # Do something with the predictions
 print(integer_predictions)
-print(X_valid.head())
+print(y_predict)
