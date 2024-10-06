@@ -101,9 +101,28 @@ print(("Best Validation Loss: {:0.4f}" +\
 
 plt.show()
 
-predictions = model.predict(X_predict)
-integer_predictions = np.round(predictions)
+predictions_data = pd.read_csv('./input/test.csv')
 
-# Do something with the predictions
+predictions_data.pop('Embarked')
+predictions_data.pop('Cabin')
+predictions_data.pop('Name')
+predictions_data.pop('Ticket')
+passenger_ids = predictions_data.pop('PassengerId').to_numpy()
+
+print(passenger_ids)
+
+predictions_data = fill_na_with_mean(predictions_data, 'Age')
+
+predictions_data['Sex'] = predictions_data['Sex'].map(
+    {
+        'male': 0,
+        'female': 1
+    }
+)
+
+predictions = model.predict(predictions_data)
+integer_predictions = np.round(predictions).flatten()
 print(integer_predictions)
-print(y_predict)
+
+output = pd.DataFrame({'PassengerId': passenger_ids, 'Survived': integer_predictions})
+output.to_csv('submission.csv', index=False)
